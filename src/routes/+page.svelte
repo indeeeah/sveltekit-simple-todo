@@ -6,25 +6,27 @@
     import { goto } from '$app/navigation';
 
     let list = [];
-    let now = today('Asia/Seoul');
     let value = today('Asia/Seoul');
 
-    function addTodo() {
+    async function addTodo() {
+        const formattedDate = `${value.year}-${String(value.month).padStart(2, '0')}-${String(value.day).padStart(2, '0')}`;
+
         if (list.length > 0) {
-            todosStore.update(todos => {
-                const newTodos = list.map(e => ({
-                    id: Math.random(),
-                    text: e,
-                    done: false,
-                    date: `${value.year}-${String(value.month).padStart(2, '0')}-${String(value.day).padStart(2, '0')}`,
-                }));
-                return [...todos, ...newTodos];
-            });
+            for (let i = 0; i < list.length; i++) {
+                const text = list[i];
+                const newTodo = { id: Math.random(), text, done: false, date: `${formattedDate}` };
+
+                await fetch(`/to-do/${formattedDate}`, {
+                    method: 'POST',
+                    body: JSON.stringify(newTodo),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            }
             
             list = [];
         }
         
-        goto(`/to-do/${now.year}-${String(now.month).padStart(2, '0')}-${String(now.day).padStart(2, '0')}`);
+        goto(`/to-do/${formattedDate}`);
     }
 </script>
 

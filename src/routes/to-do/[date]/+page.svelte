@@ -4,40 +4,77 @@
     import { CalendarDate } from '@internationalized/date';
     import LeftIcon from '$lib/icons/LeftIcon.svelte';
     import RightIcon from '$lib/icons/RightIcon.svelte';
-	import { todosStore } from '../../../store';
+	import { onMount } from 'svelte';
 
     let [year, month, day] = $page.params.date.split('-').map(Number);
     let date = new CalendarDate(year, month, day);
-    $: {
-        [year, month, day] = [date.year, date.month, date.day];
-    }
+
+    $: todos = $page.data.todos;
+    $: [year, month, day] = [date.year, date.month, date.day];
 
     let text = '';
 
-    function addTodo() {
+    onMount(async () => {
+        await fetchTodos();
+    });
+
+    async function fetchTodos() {
+        const response = await fetch(`/to-do/${year}-${month}-${day}`);
+        const data = await response.json();
+        todos = data.todos;
+    }
+
+    async function addTodo() {
         if (!text) return;
 
-        todosStore.update(todosStore => [...todosStore, { id: Math.random(), text, done: false, date: year + '-' + month + '-' + day }]);
+        const newTodo = { id: Math.random(), text, done: false, date: `${year}-${month}-${day}` };
+
+        const response = await fetch(`/to-do/${year}-${month}-${day}`, {
+            method: 'POST',
+            body: JSON.stringify(newTodo),
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        todos = data.body;
         text = '';
     }
 
-    function switchDone(todo) {
+    async function switchDone(todo) {
         todo.done = !todo.done;
-        todosStore.update(todosStore => [...todosStore]);
+
+        const response = await fetch(`/to-do/${year}-${month}-${day}`, {
+            method: 'PUT',
+            body: JSON.stringify(todo),
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        todos = data.body;
     }
 
-    function deleteTodo(todo) {
-        todosStore.update(todosStore => todosStore.filter(t => t.id !== todo.id));
+    async function deleteTodo(todo) {
+        const response = await fetch(`/to-do/${year}-${month}-${day}`, {
+            method: 'DELETE',
+            body: JSON.stringify({ id: todo.id }),
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        todos = data.body;
     }
 
-    function subtractDay() {
+    async function subtractDay() {
         date = date.subtract({ days: 1 });
-        goto(`/to-do/${date.toString()}`);
+        await goto(`/to-do/${date.toString()}`);
     }
 
-    function addDay() {
+    async function addDay() {
         date = date.add({ days: 1 });
-        goto(`/to-do/${date.toString()}`);
+        await goto(`/to-do/${date.toString()}`);
     }
 </script>
 
@@ -67,7 +104,7 @@
                 </tr>
             </thead>
             <tbody>
-                {#each $todosStore.filter(todo => todo.date === `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`) as todo}
+                {#each todos as todo}
                     <tr>
                         <td>{todo.text}</td>
                         <td class="text-center"><button on:click={() => switchDone(todo)} class="chip {todo.done ? 'variant-filled' : 'variant-soft'}">{todo.done ? 'Yes' : 'No'}</button></td>
