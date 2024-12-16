@@ -10,6 +10,7 @@
     let navItems = [
         { name: "Home", href: "/", icon: HomeIcon },
         { name: "To-do", href: "/to-do/:date", icon: ListIcon },
+        { name: "Playground", href: "/playground" }
     ];
 
     function isSelected(href) {
