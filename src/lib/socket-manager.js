@@ -1,14 +1,10 @@
-// socket-manager.js
 import net from 'net';
 import { GlobalThisWSS } from './server/web-socket-util';
 
 class SocketManager {
-    static instance = null;
-
     constructor() {
         this.tcpClient = null;
-        this.isLoggedIn = false;
-        this.listeners = [];
+        this.buffer = ''
     }
 
     // TCP 연결 초기화
@@ -22,40 +18,82 @@ class SocketManager {
 
         this.tcpClient.connect(config.port, config.host, () => {
             console.log('Connected to TCP server');
-            this.sendLoginMessage(config.credentials);
         });
 
+        let buffer = '';
         this.tcpClient.on('data', (data) => {
-            this.handleMessage(data.toString().trim());
-        });
+            buffer += data.toString();
+
+            let newlineIndex;
+            while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
+                const message = buffer.slice(0, newlineIndex);
+                buffer = buffer.slice(newlineIndex + 1);
+
+                if (message.trim()) {
+                    try {
+                        const parsedMessage = JSON.parse(message);
+                        console.log('parsedMessage: ', JSON.stringify(parsedMessage));
+                        this.broadcastToWebSocketClients(parsedMessage);
+                    } catch (error) {
+                        console.error('Error parsing message:', error);
+                    }
+                }
+            }
+        })
 
         this.tcpClient.on('error', (err) => {
             console.error('TCP error:', err);
-            this.isLoggedIn = false;
             this.notifyListeners();
         });
 
         this.tcpClient.on('close', () => {
             console.log('TCP connection closed');
             this.tcpClient = null;
-            this.isLoggedIn = false;
             this.notifyListeners();
         });
     }
 
-    // TCP 메시지 처리
-    handleMessage(message) {
-        try {
-            const parsedMessage = JSON.parse(message);
-            console.log(parsedMessage);
-            if (parsedMessage.login && parsedMessage.login.status === 'loginok') {
-                console.log('Login successful');
-                this.isLoggedIn = true;
-                this.notifyListeners();
-            }
+    login(config) {
+        this.sendLoginMessage(config.credentials);
+    }
 
-            // 웹소켓 클라이언트에 메시지 전달
-            this.broadcastToWebSocketClients(parsedMessage);
+    requestMatchList() {
+        const now = Date.now();
+        const oneDayInMs = 24 * 60 * 60 * 1000;
+    
+        const message = {
+            match_list_request: {
+                timestamp: now,
+                date_from: now,
+                date_to: now + oneDayInMs,
+            },
+        };
+
+        this.sendMessage(message); // 메시지 전송
+        console.log(`\n[Sent] Match List Request : ${JSON.stringify(message)}`);
+    }
+
+    // TCP 메시지 처리
+    handleMessage(data) {
+        try {
+            let buffer = '';
+            buffer += data.toString();
+
+            let newlineIndex;
+            while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
+                const message = buffer.slice(0, newlineIndex);
+                buffer = buffer.slice(newlineIndex + 1);
+
+                if (message.trim()) {
+                    try {
+                        const parsedMessage = JSON.parse(message);
+                        console.log('parsedMessage: ', JSON.stringify(parsedMessage));
+                        this.broadcastToWebSocketClients(parsedMessage);
+                    } catch (error) {
+                        console.error('Error parsing message:', error);
+                    }
+                }
+            }
         } catch (error) {
             console.error('Failed to parse TCP message:', error);
         }
@@ -104,24 +142,10 @@ class SocketManager {
         console.log('Login message sent:', loginMessage);
     }
 
-    // TCP 상태 확인
-    checkConnection() {
-        return this.isLoggedIn;
-    }
-
-    // 상태 변경 알림
-    onStatusChange(listener) {
-        this.listeners.push(listener);
-    }
-
-    notifyListeners() {
-        this.listeners.forEach((listener) => listener(this.isLoggedIn));
-    }
-
     // 다른 API 요청을 처리
     sendMessage(message) {
-        if (!this.tcpClient || !this.isLoggedIn) {
-            console.error('Cannot send message. Not connected or logged in.');
+        if (!this.tcpClient) {
+            console.error('Cannot send message. Not connected.');
             return;
         }
 

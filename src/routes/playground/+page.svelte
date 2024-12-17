@@ -111,6 +111,20 @@
         }
     }
 
+    const requestMatchList = async () => {
+        try {
+            const response = await fetch('/playground/match-list', {
+                method: 'POST'
+            });
+            const data = await response.json();
+            console.log('매치 리스트 응답:', data);
+            logEvent(`매치 리스트 응답: ${JSON.stringify(data)}`);
+        } catch (error) {
+            console.error('매치 리스트 요청 실패: ', error);
+            logEvent(`매치 리스트 요청 실패: ${error.message}`);
+        }
+    }
+
     // 컴포넌트가 제거될 때 웹소켓 연결 정리
     onDestroy(() => {
         if (ws) {
@@ -142,6 +156,9 @@
             class="btn variant-filled"
         >
             로그인
+        </button>
+        <button class="btn variant-filled" disabled={!isLoggedIn} on:click={requestMatchList}>
+            리스트 받아오기
         </button>
     </div>
     <div class="mt-4 max-h-[400px] overflow-y-auto">

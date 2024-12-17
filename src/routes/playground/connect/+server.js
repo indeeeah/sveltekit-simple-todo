@@ -14,6 +14,7 @@ const config = {
 export async function POST() {
     try {
         socketManager.connect(config);
+        socketManager.login(config);
         return json({ status: 'success', message: 'Connected to TCP server' });
     } catch (error) {
         console.error('Connection failed:', error);
