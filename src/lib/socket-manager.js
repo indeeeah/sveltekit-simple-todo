@@ -54,7 +54,16 @@ class SocketManager {
     }
 
     login(config) {
-        this.sendLoginMessage(config.credentials);
+        const message = {
+            login: {
+                timestamp: Date.now(),
+                bookmakerid: config.credentials.bookmakerid,
+                key: config.credentials.key,
+            },
+        }
+
+        this.sendMessage(message);
+        console.log('Login message sent:', message);
     }
 
     requestMatchList() {
@@ -124,25 +133,7 @@ class SocketManager {
         });
     }
 
-    // TCP 로그인 메시지 전송
-    sendLoginMessage(credentials) {
-        if (!this.tcpClient) {
-            console.error('TCP client not connected');
-            return;
-        }
-
-        const loginMessage = {
-            login: {
-                timestamp: Date.now(),
-                bookmakerid: credentials.bookmakerid,
-                key: credentials.key,
-            },
-        };
-        this.tcpClient.write(JSON.stringify(loginMessage) + '\n');
-        console.log('Login message sent:', loginMessage);
-    }
-
-    // 다른 API 요청을 처리
+    // API 요청을 처리
     sendMessage(message) {
         if (!this.tcpClient) {
             console.error('Cannot send message. Not connected.');
