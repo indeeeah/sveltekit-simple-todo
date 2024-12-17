@@ -11,6 +11,8 @@
         log = [...log, typeof str === 'string' ? str : JSON.stringify(str)];
     }
 
+    let matchData = [];
+
     const establishWebSocket = () => {
         if (webSocketEstablished) return;
         console.log('웹소켓 연결 시도');
@@ -57,6 +59,10 @@
 
                     if (data.keep_alive) {
                         isLoggedIn = true;
+                    }
+
+                    if (data.match_list_response) {
+                        matchData = data.match_list_response.match;
                     }
                 } catch (error) {
                     console.error('메시지 파싱 오류:', error);
@@ -132,11 +138,23 @@
             isLoggedIn = false;
         }
     });
+
+
+  // 날짜 포맷 함수 (timestamp 변환)
+  function formatDate(timestamp) {
+    const date = new Date(timestamp);
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
 </script>
 
 <main class="flex flex-col items-center justify-center h-full -mt-14">
-    <h1 class="text-[50px] font-bold pb-6">Playground</h1>
-    <div class="flex gap-4">
+    <div class="flex gap-4 mb-6">
         <button 
             disabled={webSocketEstablished} 
             on:click={establishWebSocket} 
@@ -161,11 +179,51 @@
             리스트 받아오기
         </button>
     </div>
-    <div class="mt-4 max-h-[400px] overflow-y-auto">
+    <h1 class="text-[50px] font-bold pb-6">Playground</h1>
+    <!-- <div class="mt-4 max-h-[400px] overflow-y-auto">
         <ul class="space-y-2">
             {#each log as event}
                 <li class="text-sm">{event}</li>
             {/each}
         </ul>
-    </div>
+    </div> -->
+    <h1 class="text-2xl font-bold mb-4 text-center">Match Information</h1>
+  <div class="overflow-hidden shadow-md rounded-lg bg-white">
+    <table class="table-auto w-full text-left border-collapse">
+      <thead class="bg-gray-200">
+        <tr>
+          <th class="text-xs px-1 text-gray-600">Match ID</th>
+          <th class="text-xs px-1 text-gray-600">Date</th>
+          <th class="text-xs px-1 text-gray-600">Teams</th>
+          <th class="text-xs px-1 text-gray-600">League</th>
+          <th class="text-xs px-1 text-gray-600">Countries</th>
+          <th class="text-xs px-1 text-gray-600">Stadium</th>
+          <th class="text-xs px-1 text-gray-600">Coverage</th>
+          <th class="text-xs px-1 text-gray-600">Play State</th>
+          <th class="text-xs px-1 text-gray-600">Sport</th>
+          <th class="text-xs px-1 text-gray-600">Half-Time Duration</th>
+          <th class="text-xs px-1 text-gray-600">Overtime Duration</th>
+          <th class="text-xs px-1 text-gray-600">Home Advantage</th>
+        </tr>
+      </thead>
+      <tbody>
+        {#each matchData as match}
+            <tr class="bg-gray-50">
+            <td class="text-xs px-1 text-gray-600">{match.matchid}</td>
+            <td class="text-xs px-1 text-gray-600">{formatDate(match.timestamp)}</td>
+            <td class="text-xs px-1 text-gray-600">{match.team1} vs {match.team2}</td>
+            <td class="text-xs px-1 text-gray-600">{match.league}</td>
+            <td class="text-xs px-1 text-gray-600">{match.country1} vs {match.country2}</td>
+            <td class="text-xs px-1 text-gray-600">{match.stadium}</td>
+            <td class="text-xs px-1 text-gray-600">{match.coverage}</td>
+            <td class="text-xs px-1 text-gray-600">{match.playstate}</td>
+            <td class="text-xs px-1 text-gray-600">{match.sportname}</td>
+            <td class="text-xs px-1 text-gray-600">{match.league_halftime_duration} mins</td>
+            <td class="text-xs px-1 text-gray-600">{match.league_overtime_duration} mins</td>
+            <td class="text-xs px-1 text-gray-600">{matchData.homeAdvantage}</td>
+            </tr>
+        {/each}
+      </tbody>
+    </table>
+  </div>
 </main>
