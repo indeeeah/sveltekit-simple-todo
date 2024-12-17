@@ -1,5 +1,6 @@
 <script>
 	import { onDestroy } from "svelte";
+	import List from "../../components/List.svelte";
 
     let webSocketEstablished = false;
     let ws = null;
@@ -139,21 +140,64 @@
         }
     });
 
+    const eventData = {
+        event: [
+        {
+            lineups: [],
+            matchid: 2102549,
+            event_number: 3,
+            event_code_id: 524,
+            timestamp: 1734339351121,
+            event_code: "Jersey colours updated",
+            minute: 0,
+            tickerstate: "Not started",
+            tickerstateid: 1,
+            score_home: 0,
+            score_away: 0,
+            clears_event: [],
+            related_events: [],
+            related_event_codes: [],
+            statistics: ["1063=50", "2087=50"],
+            value_event_data: "16=-10027060 17=-10027060 18=-10027060 19=-10027060 20=0 15=26962 25=true",
+            score: [],
+            currentPlaytime: 0,
+            clockRunning: false,
+        },
+        ],
+        timestamp: 1734339356146,
+        status: "event",
+        saved_at: "2024-12-16T08:55:56.255Z",
+    };
 
-  // 날짜 포맷 함수 (timestamp 변환)
-  function formatDate(timestamp) {
-    const date = new Date(timestamp);
-    return date.toLocaleString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
+    // 날짜 포맷 함수
+    function formatDate(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        });
+    }
+
+    // 통계 데이터를 Key=Value 형태로 변환
+    function parseStatistics(statistics) {
+        return statistics.map((stat) => {
+        const [key, value] = stat.split("=");
+        return { key, value };
+        });
+    }
+
+    const matchEvent = eventData.event[0];
 </script>
 
-<main class="flex flex-col items-center justify-center h-full -mt-14">
+<main class="flex flex-col items-center justify-center h-full -mt-10">
+    <div class="grid grid-cols-2 size-full">
+        <List matchData={matchData} />
+        <div class="bg-red-200"></div>
+    </div>
     <div class="flex gap-4 mb-6">
         <button 
             disabled={webSocketEstablished} 
@@ -187,43 +231,12 @@
             {/each}
         </ul>
     </div> -->
-    <h1 class="text-2xl font-bold mb-4 text-center">Match Information</h1>
-  <div class="overflow-hidden shadow-md rounded-lg bg-white">
-    <table class="table-auto w-full text-left border-collapse">
-      <thead class="bg-gray-200">
-        <tr>
-          <th class="text-xs px-1 text-gray-600">Match ID</th>
-          <th class="text-xs px-1 text-gray-600">Date</th>
-          <th class="text-xs px-1 text-gray-600">Teams</th>
-          <th class="text-xs px-1 text-gray-600">League</th>
-          <th class="text-xs px-1 text-gray-600">Countries</th>
-          <th class="text-xs px-1 text-gray-600">Stadium</th>
-          <th class="text-xs px-1 text-gray-600">Coverage</th>
-          <th class="text-xs px-1 text-gray-600">Play State</th>
-          <th class="text-xs px-1 text-gray-600">Sport</th>
-          <th class="text-xs px-1 text-gray-600">Half-Time Duration</th>
-          <th class="text-xs px-1 text-gray-600">Overtime Duration</th>
-          <th class="text-xs px-1 text-gray-600">Home Advantage</th>
-        </tr>
-      </thead>
-      <tbody>
-        {#each matchData as match}
-            <tr class="bg-gray-50">
-            <td class="text-xs px-1 text-gray-600">{match.matchid}</td>
-            <td class="text-xs px-1 text-gray-600">{formatDate(match.timestamp)}</td>
-            <td class="text-xs px-1 text-gray-600">{match.team1} vs {match.team2}</td>
-            <td class="text-xs px-1 text-gray-600">{match.league}</td>
-            <td class="text-xs px-1 text-gray-600">{match.country1} vs {match.country2}</td>
-            <td class="text-xs px-1 text-gray-600">{match.stadium}</td>
-            <td class="text-xs px-1 text-gray-600">{match.coverage}</td>
-            <td class="text-xs px-1 text-gray-600">{match.playstate}</td>
-            <td class="text-xs px-1 text-gray-600">{match.sportname}</td>
-            <td class="text-xs px-1 text-gray-600">{match.league_halftime_duration} mins</td>
-            <td class="text-xs px-1 text-gray-600">{match.league_overtime_duration} mins</td>
-            <td class="text-xs px-1 text-gray-600">{matchData.homeAdvantage}</td>
-            </tr>
-        {/each}
-      </tbody>
-    </table>
-  </div>
+    <!-- 카드 형식으로 데이터 표시 -->
+    <h1 class="text-2xl font-bold text-center mb-4">Match Event Details</h1>
+    <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
+        <div class="font-semibold text-gray-800">{matchEvent.matchid} #{matchEvent.event_number}</div>
+        <h2 class="text-xl font-bold mb-2 text-center">Home {matchEvent.score_home} : Away {matchEvent.score_away}</h2>
+        <div class="text-gray-600">{matchEvent.event_code}</div>
+        <div class="text-gray-600">{formatDate(matchEvent.timestamp)}</div>
+    </div>
 </main>
