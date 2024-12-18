@@ -1,5 +1,10 @@
 import net from 'net';
 import { GlobalThisWSS } from './server/web-socket-util';
+import fs from 'fs';
+import path from 'path';
+
+const __dirname = new URL('.', import.meta.url).pathname;
+const jsonData = JSON.parse(fs.readFileSync(path.resolve(__dirname, './game.json'), 'utf8'));
 
 class SocketManager {
     constructor() {
@@ -18,17 +23,28 @@ class SocketManager {
 
         this.tcpClient.connect(config.port, config.host, () => {
             console.log('Connected to TCP server');
+
+            let eventIndex = 0;
+            const intervalId = setInterval(() => {
+                if (eventIndex < jsonData.length) {
+                    this.broadcastToWebSocketClients(jsonData[eventIndex]);
+                    eventIndex++;
+                } else {
+                    // 모든 이벤트를 보낸 후 종료
+                    clearInterval(intervalId);
+                }
+            }, 2000);
         });
 
         let buffer = '';
         this.tcpClient.on('data', (data) => {
             buffer += data.toString();
-
+            
             let newlineIndex;
             while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
                 const message = buffer.slice(0, newlineIndex);
                 buffer = buffer.slice(newlineIndex + 1);
-
+                
                 if (message.trim()) {
                     try {
                         const parsedMessage = JSON.parse(message);

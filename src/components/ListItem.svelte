@@ -1,0 +1,48 @@
+<script>
+    export let match;
+    export let getGameEvents;
+</script>
+
+<button class="w-full" on:click={() => getGameEvents(match.matchid)}>
+    <div class="h-10 flex items-center px-4">
+        <span class="text-white text-xs font-bold">#{match.matchid}</span>
+    </div>
+    <div class="border border-gray-500 bg-gray-600">
+        <div class="h-10 flex items-center px-4 shadow-md">
+            <div class="flex gap-2">
+                <span class="text-gray-300 text-xs font-bold">{match.date}</span>
+                <span class="text-white text-xs font-bold">{match.time}</span>
+            </div>
+        </div>
+        <div class="h-32 py-4 px-6 flex flex-col justify-center">
+            <div class="flex items-center justify-center w-full mb-2">
+                <div class="grid grid-cols-3 gap-4 w-full items-center">
+                    <span class="text-white text-[20px] font-bold text-center">{match.team1}</span>
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="flex gap-4 justify-center">
+                            <span class="text-white text-[35px] font-bold">{match.score1}</span>
+                            <span class="text-white text-[35px] font-bold">:</span>
+                            <span class="text-white text-[35px] font-bold">{match.score2}</span>
+                        </div>
+                        <div class="text-gray-200 text-xs">{match.situation}</div>
+                    </div>
+                    <span class="text-white text-[20px] font-bold text-center">{match.team2}</span>
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-gray-200 rounded-full w-full h-8 flex justify-between p-4 items-center">
+                    <div class="font-bold text-xs text-gray-400">홈 승</div>
+                    <div class="font-bold text-xs text-yellow-400">{match.bet1}</div>
+                </div>
+                <div class="bg-gray-200 rounded-full w-full h-8 flex justify-between p-4 items-center">
+                    <div class="font-bold text-xs text-gray-400">무</div>
+                    <div class="font-bold text-xs text-yellow-400">{match.bet2}</div>
+                </div>
+                <div class="bg-gray-200 rounded-full w-full h-8 flex justify-between p-4 items-center">
+                    <div class="font-bold text-xs text-gray-400">원정 승</div>
+                    <div class="font-bold text-xs text-yellow-400">{match.bet3}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</button>

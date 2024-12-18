@@ -1,6 +1,5 @@
 <script>
     import { InputChip } from '@skeletonlabs/skeleton';
-    import { todosStore } from '../store';
     import Calendar from '$lib/components/ui/calendar/calendar.svelte';
     import { today } from '@internationalized/date';
     import { goto } from '$app/navigation';
