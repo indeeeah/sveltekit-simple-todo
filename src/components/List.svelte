@@ -4,6 +4,9 @@
 
     export let matchData;
     export let getGameEvents;
+    export let events;
+
+    $: eventData = $events;
 
     let tabSet = 0;
 
@@ -37,17 +40,17 @@
     </div>
     {#if tabSet === 0}
         {#each matchData as match}
-            <ListItem match={match} getGameEvents={getGameEvents} />
+            <ListItem match={match} getGameEvents={getGameEvents} event={eventData[match.matchid]} />
         {/each}
     {/if}
     {#if tabSet === 1}
         {#each curGames as match}
-            <ListItem match={match} getGameEvents={getGameEvents} />
+            <ListItem match={match} getGameEvents={getGameEvents} event={eventData[match.matchid]} />
         {/each}
     {/if}
     {#if tabSet > 1}
         {#each dayGames as match}
-            <ListItem match={match} getGameEvents={getGameEvents} />
+            <ListItem match={match} getGameEvents={getGameEvents} event={eventData[match.matchid]} />
         {/each}
     {/if}
 </div>

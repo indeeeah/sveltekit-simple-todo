@@ -25,7 +25,8 @@ class SocketManager {
         this.tcpClient.connect(config.port, config.host, () => {
             console.log('Connected to TCP server');
 
-            this.broadcastToWebSocketClients(matchListData);
+            // NOTE: 리스트를 안가져오는 경우가 있음
+            // this.broadcastToWebSocketClients(matchListData);
 
             let eventIndex = 0;
             const intervalId = setInterval(() => {

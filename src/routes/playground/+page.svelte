@@ -1,5 +1,5 @@
 <script>
-	import { onDestroy } from "svelte";
+	import { onDestroy, onMount } from "svelte";
 	import List from "../../components/List.svelte";
 	import { eventsStore, matchDataStore } from "../../store";
 	import Live from "../../components/Live.svelte";
@@ -80,7 +80,7 @@
 
     let list = [...pastGame];
     let gameData = [];
-    let gameInfo = {};
+    let gameInfo = null;
 
     $: matchDataStore.subscribe((data) => {
         list = [...pastGame, ...convertMatchData(data)];
@@ -96,8 +96,8 @@
             bet1: (Math.random() * 20).toFixed(2),
             bet2: (Math.random() * 20).toFixed(2),
             bet3: (Math.random() * 20).toFixed(2),
-            score1: new Date(match.timestamp) > new Date() ? 0 : (Math.random() * 10).toFixed(0),
-            score2: new Date(match.timestamp) > new Date() ? 0 : (Math.random() * 10).toFixed(0),
+            score1: new Date(match.timestamp) > new Date() ? '-' : (Math.random() * 10).toFixed(0),
+            score2: new Date(match.timestamp) > new Date() ? '-' : (Math.random() * 10).toFixed(0),
             situation: new Date(match.timestamp) > new Date() ? '경기 전' : '경기 중',
             timestamp: match.timestamp,
             league: `${match.league}, ${match.league_country}`,
@@ -144,7 +144,17 @@
                     }
 
                     if (data.event) {
-                        eventsStore.update(events => [...events, data.event[0]]);
+                        const matchId = data.event[0].matchid;
+
+                        eventsStore.update(events => {
+                            if (!events[matchId]) {
+                                events[matchId] = [];
+                            }
+
+                            events[matchId].push(data.event[0]);
+
+                            return { ...events };
+                        });
                     }
                 } catch (error) {
                     console.error('메시지 파싱 오류:', error);
@@ -195,11 +205,11 @@
 
     const getGameEvents = (matchid) => {
         eventsStore.subscribe(events => {
-            gameData = events.filter(event => event.matchid === matchid);
+            gameData = events[matchid] || [];
         });
 
         gameInfo = list.find(e => e.matchid === matchid) || {};
-    }
+    };
 
     // 컴포넌트가 제거될 때 웹소켓 연결 정리
     onDestroy(() => {
@@ -216,14 +226,20 @@
             return { key, value };
         });
     }
+
+    onMount(async () => {
+        await establishWebSocket();
+        await login();
+        await requestMatchList();
+    });
 </script>
 
 <main class="flex flex-col items-center justify-center h-full -mt-10">
     <div class="grid grid-cols-2 size-full">
-        <List matchData={list} getGameEvents={getGameEvents} />
+        <List matchData={list} getGameEvents={getGameEvents} events={eventsStore} />
         <Live gameData={gameData} gameInfo={gameInfo} />
     </div>
-    <div class="flex gap-4 mb-6">
+    <!-- <div class="flex gap-4 mb-6">
         <button 
             disabled={webSocketEstablished} 
             on:click={establishWebSocket} 
@@ -241,5 +257,5 @@
         <button class="btn variant-filled" disabled={!isLoggedIn} on:click={requestMatchList}>
             리스트 받아오기
         </button>
-    </div>
+    </div> -->
 </main>

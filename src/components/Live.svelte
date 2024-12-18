@@ -37,24 +37,24 @@
     }
 </script>
 
-<div class="bg-gray-700 h-[800px] overflow-y-auto p-6">
-    <div class="flex justify-center items-center font-bold text-md text-white w-full w-20 h-10">
+<div class="bg-gray-700 h-[800px] overflow-y-auto p-6 border-l border-gray-500">
+    <div class="flex justify-center items-center font-bold text-md text-white w-full w-20 h-10 border-b border-gray-500">
         상세 경기 정보
     </div>
-    {#if gameData.length > 0}
-        <div class="h-12 w-full flex items-center justify-between mb-2">
-            <span class="text-md font-bold text-white bg-red-400 rounded-full px-2">{gameInfo.team1}</span>
+    {#if gameInfo && gameData.length > 0}
+        <div class="h-12 w-full flex items-center mb-2 grid grid-cols-3">
+            <span class="text-md font-bold text-white border-b-2 border-red-400 text-center">{gameInfo.team1}</span>
             <div class="flex flex-col items-center">
                 <div class="h-5">
                     <span class="border border-gray-500 text-[10px] text-center bg-gray-600 text-gray-400 rounded-sm">{gameData[gameData.length - 1].event_code}</span>
                 </div>
-                <div class="flex flex gap-2">
+                <div class="flex flex gap-2 justify-center">
                     <span class="text-md font-bold text-white">{gameData[gameData.length - 1].score_home}</span>
                     <span class="text-md font-bold text-white">:</span>
                     <span class="text-md font-bold text-white">{gameData[gameData.length - 1].score_away}</span>
                 </div>
             </div>
-            <span class="text-md font-bold text-white bg-blue-400 rounded-full px-2">{gameInfo.team2}</span>
+            <span class="text-md font-bold text-white border-b-2 border-blue-400 text-center">{gameInfo.team2}</span>
         </div>
         <div class="w-full h-4 mb-4 rounded-full flex overflow-hidden">
             <div
@@ -107,16 +107,16 @@
             {/each}
         </div>
     {/if}
-    {#if gameData.length === 0}
-        <div class="h-12 w-full flex items-center justify-between mb-2">
-            <span class="text-md font-bold text-white bg-red-400 rounded-full px-2">{gameInfo.team1}</span>
+    {#if gameInfo && gameData.length === 0}
+        <div class="h-12 w-full flex items-center mb-2 grid grid-cols-3">
+            <span class="text-md font-bold text-white border-b-2 border-red-400 text-center">{gameInfo.team1}</span>
             <div class="text-center">
-                <div class="flex flex gap-2">
+                <div class="flex flex gap-2 justify-center">
                     <span class="text-xs font-bold text-gray-300">{gameInfo.date}</span>
                     <span class="text-xs font-bold text-white">{gameInfo.time}</span>
                 </div>
             </div>
-            <span class="text-md font-bold text-white bg-blue-400 rounded-full px-2">{gameInfo.team2}</span>
+            <span class="text-md font-bold text-white border-b-2 border-blue-400 text-center">{gameInfo.team2}</span>
         </div>
         <div class="h-[650px] flex flex-col items-center justify-center">
             <span class="text-[35px] font-bold text-white mb-4">경기 예정</span>            
@@ -124,6 +124,11 @@
                 <span class="text-md font-bold text-gray-300">{gameInfo.date}</span>
                 <span class="text-md font-bold text-white">{gameInfo.time}</span>
             </div>
+        </div>
+    {/if}
+    {#if !gameInfo}
+        <div class="h-[700px] flex items-center justify-center text-white font-bold text-lg">
+            경기를 클릭해 상세 정보를 확인하세요
         </div>
     {/if}
 </div>
