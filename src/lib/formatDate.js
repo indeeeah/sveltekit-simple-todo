@@ -34,3 +34,13 @@ export function formatDate(timestamp) {
         timeWithSeconds: formattedTimeWithSeconds
     };
 }
+
+export function formatPlaytime(playTime) {
+    const timeInSeconds = playTime / 1000;
+   
+    const second = Math.floor(timeInSeconds % 60); // 초 계산
+    const minute = Math.floor((timeInSeconds / 60) % 60); // 분 계산
+    const hour = Math.floor(timeInSeconds / 3600); // 시간 계산
+
+    return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
+}

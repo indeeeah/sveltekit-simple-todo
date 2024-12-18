@@ -1,5 +1,7 @@
 <script>
-	import { formatDate } from "$lib/formatDate";
+	import { eventCodesCrossed } from "$lib/event_code";
+	import { formatDate, formatPlaytime } from "$lib/formatDate";
+	import { getEventIcon } from "$lib/game-icon";
 
     export let gameData;
     export let gameInfo;
@@ -46,7 +48,7 @@
             <span class="text-md font-bold text-white border-b-2 border-red-400 text-center">{gameInfo.team1}</span>
             <div class="flex flex-col items-center">
                 <div class="h-5">
-                    <span class="border border-gray-500 text-[10px] text-center bg-gray-600 text-gray-400 rounded-sm">{gameData[gameData.length - 1].event_code}</span>
+                    <span class="border border-gray-500 text-[10px] text-center bg-gray-600 text-gray-400 rounded-sm">{gameData[gameData.length - 1].tickerstate} | {formatPlaytime(gameData[gameData.length - 1].currentPlaytime)}</span>
                 </div>
                 <div class="flex flex gap-2 justify-center">
                     <span class="text-md font-bold text-white">{gameData[gameData.length - 1].score_home}</span>
@@ -102,7 +104,10 @@
                             {formatDate(event.timestamp).timeWithSeconds}
                         </div>
                     </div>
-                    <div class="h-16 flex items-center p-4 text-sm text-white">{event.event_code}</div>
+                    <div class="h-16 flex items-center p-4 text-sm text-white gap-1">
+                        <span>{getEventIcon(event.event_code_id) || ''}</span>
+                        <span>{event.event_code}</span>
+                    </div>
                 </div>
             {/each}
         </div>

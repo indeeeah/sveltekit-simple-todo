@@ -4,57 +4,12 @@
 	import { eventsStore, matchDataStore } from "../../store";
 	import Live from "../../components/Live.svelte";
 	import { formatDate } from "$lib/formatDate";
+	import { getSportsEmoticon } from "$lib/game-icon";
 
     let webSocketEstablished = false;
     let ws = null;
 
     let isLoggedIn = false;
-
-    function getSportsEmoticon(sport) {
-        let emoticon;
-        switch (sport) {
-            case "Soccer":
-                emoticon = "⚽";  // 축구
-                break;
-            case "Basketball":
-                emoticon = "🏀";  // 농구
-                break;
-            case "Tennis":
-                emoticon = "🎾";  // 테니스
-                break;
-            case "Baseball":
-                emoticon = "⚾";  // 야구
-                break;
-            case "Golf":
-                emoticon = "🏌️‍♂️";  // 골프
-                break;
-            case "Rugby":
-                emoticon = "🏉";  // 럭비
-                break;
-            case "Cricket":
-                emoticon = "🏏";  // 크리켓
-                break;
-            case "Hockey":
-                emoticon = "🏒";  // 아이스하키
-                break;
-            case "Boxing":
-                emoticon = "🥊";  // 복싱
-                break;
-            case "Football":
-                emoticon = "🏈";  // 미식축구
-                break;
-            case "Volleyball":
-                emoticon = "🏐";  // 배구
-                break;
-            case "Cycling":
-                emoticon = "🚴‍♂️";  // 사이클링
-                break;
-            default:
-                emoticon = "🏅";  // 기본 이모티콘 (모든 스포츠가 아닌 경우)
-                break;
-        }
-        return emoticon;
-    }
 
     const pastGame = [
         {
