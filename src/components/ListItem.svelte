@@ -4,15 +4,17 @@
 </script>
 
 <button class="w-full" on:click={() => getGameEvents(match.matchid)}>
-    <div class="h-10 flex items-center px-4">
-        <span class="text-white text-xs font-bold">#{match.matchid}</span>
+    <div class="h-10 flex items-center px-4 gap-2">
+        <span class="text-xs">{match.sportIcon}</span>
+        <span class="text-white text-xs font-bold">{match.league}</span>
     </div>
     <div class="border border-gray-500 bg-gray-600">
-        <div class="h-10 flex items-center px-4 shadow-md">
+        <div class="h-10 flex items-center px-4 shadow-md justify-between">
             <div class="flex gap-2">
                 <span class="text-gray-300 text-xs font-bold">{match.date}</span>
                 <span class="text-white text-xs font-bold">{match.time}</span>
             </div>
+            <span class="text-gray-300 text-xs font-bold">{match.stadium}</span>
         </div>
         <div class="h-32 py-4 px-6 flex flex-col justify-center">
             <div class="flex items-center justify-center w-full mb-2">

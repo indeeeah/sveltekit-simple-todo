@@ -10,6 +10,52 @@
 
     let isLoggedIn = false;
 
+    function getSportsEmoticon(sport) {
+        let emoticon;
+        switch (sport) {
+            case "Soccer":
+                emoticon = "⚽";  // 축구
+                break;
+            case "Basketball":
+                emoticon = "🏀";  // 농구
+                break;
+            case "Tennis":
+                emoticon = "🎾";  // 테니스
+                break;
+            case "Baseball":
+                emoticon = "⚾";  // 야구
+                break;
+            case "Golf":
+                emoticon = "🏌️‍♂️";  // 골프
+                break;
+            case "Rugby":
+                emoticon = "🏉";  // 럭비
+                break;
+            case "Cricket":
+                emoticon = "🏏";  // 크리켓
+                break;
+            case "Hockey":
+                emoticon = "🏒";  // 아이스하키
+                break;
+            case "Boxing":
+                emoticon = "🥊";  // 복싱
+                break;
+            case "Football":
+                emoticon = "🏈";  // 미식축구
+                break;
+            case "Volleyball":
+                emoticon = "🏐";  // 배구
+                break;
+            case "Cycling":
+                emoticon = "🚴‍♂️";  // 사이클링
+                break;
+            default:
+                emoticon = "🏅";  // 기본 이모티콘 (모든 스포츠가 아닌 경우)
+                break;
+        }
+        return emoticon;
+    }
+
     const pastGame = [
         {
             matchid: 2102549,
@@ -23,7 +69,12 @@
             score1: 1,
             score2: 2,
             situation: '경기 중',
-            timestamp: '2024-12-16 08:00:00'
+            timestamp: '2024-12-16 08:00:00',
+            league: 'Euroleague Women, Europe',
+            stadium: 'Arena Vodova',
+            country: 'Czech Republic, France',
+            sportname: 'Soccer',
+            sportIcon: getSportsEmoticon('Soccer')
         }
     ];
 
@@ -48,7 +99,12 @@
             score1: new Date(match.timestamp) > new Date() ? 0 : (Math.random() * 10).toFixed(0),
             score2: new Date(match.timestamp) > new Date() ? 0 : (Math.random() * 10).toFixed(0),
             situation: new Date(match.timestamp) > new Date() ? '경기 전' : '경기 중',
-            timestamp: match.timestamp
+            timestamp: match.timestamp,
+            league: `${match.league}, ${match.league_country}`,
+            stadium: match.stadium,
+            country: `${match.country1}, ${match.country2}`,
+            sportname: match.sportname,
+            sportIcon: getSportsEmoticon(match.sportname)
         }));
     }
 
@@ -186,13 +242,4 @@
             리스트 받아오기
         </button>
     </div>
-    <h1 class="text-[50px] font-bold pb-6">Playground</h1>
-    <!-- 카드 형식으로 데이터 표시 -->
-    <!-- <h1 class="text-2xl font-bold text-center mb-4">Match Event Details</h1>
-    <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
-        <div class="font-semibold text-gray-800">{matchEvent.matchid} #{matchEvent.event_number}</div>
-        <h2 class="text-xl font-bold mb-2 text-center">Home {matchEvent.score_home} : Away {matchEvent.score_away}</h2>
-        <div class="text-gray-600">{matchEvent.event_code}</div>
-        <div class="text-gray-600">{formatDate(matchEvent.timestamp)}</div>
-    </div> -->
 </main>

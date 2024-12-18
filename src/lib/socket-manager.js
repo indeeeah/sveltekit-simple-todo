@@ -5,6 +5,7 @@ import path from 'path';
 
 const __dirname = new URL('.', import.meta.url).pathname;
 const jsonData = JSON.parse(fs.readFileSync(path.resolve(__dirname, './game.json'), 'utf8'));
+const matchListData = JSON.parse(fs.readFileSync(path.resolve(__dirname, './match-list.json'), 'utf8'));
 
 class SocketManager {
     constructor() {
@@ -23,6 +24,8 @@ class SocketManager {
 
         this.tcpClient.connect(config.port, config.host, () => {
             console.log('Connected to TCP server');
+
+            this.broadcastToWebSocketClients(matchListData);
 
             let eventIndex = 0;
             const intervalId = setInterval(() => {
