@@ -5,7 +5,7 @@
     export let getGameEvents;
     export let event;
 
-    $: lastEvent = event ? event.slice(-1)[0] : null;
+    $: lastEvent = event ? event.list.slice(-1)[0] : null;
 </script>
 
 <button class="w-full mb-2" on:click={() => getGameEvents(match.matchid)}>

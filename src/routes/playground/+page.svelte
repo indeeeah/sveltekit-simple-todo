@@ -34,7 +34,7 @@
     ];
 
     let list = [...pastGame];
-    let gameData = [];
+    let gameData = null;
     let gameInfo = null;
 
     $: matchDataStore.subscribe((data) => {
@@ -103,10 +103,19 @@
 
                         eventsStore.update(events => {
                             if (!events[matchId]) {
-                                events[matchId] = [];
+                                events[matchId] = {
+                                    list: [],
+                                    recentStatistics: {}
+                                };
                             }
 
-                            events[matchId].push(data.event[0]);
+                            events[matchId].list.push(data.event[0]);
+
+                            const stats = data.event[0].statistics;
+                            stats.forEach(stat => {
+                                const [key, value] = stat.split('=');
+                                events[matchId].recentStatistics[key] = parseInt(value, 10);
+                            });
 
                             return { ...events };
                         });
@@ -160,10 +169,10 @@
 
     const getGameEvents = (matchid) => {
         eventsStore.subscribe(events => {
-            gameData = events[matchid] || [];
+            gameData = events[matchid] || null;
         });
 
-        gameInfo = list.find(e => e.matchid === matchid) || {};
+        gameInfo = list.find(e => e.matchid === matchid) || null;
     };
 
     // 컴포넌트가 제거될 때 웹소켓 연결 정리
